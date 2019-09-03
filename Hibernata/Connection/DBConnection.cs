@@ -31,7 +31,7 @@ namespace Hibernata.Connection
                 throw new NataException(NataException.NO_NULL_CREDENTIALS);
 
             stringConnection =
-                "Server=localhost; " +
+                "server=localhost; " +
                 "database=" + databaseName + "; " +
                 "username=" + userName + "; " +
                 "password=" + password;

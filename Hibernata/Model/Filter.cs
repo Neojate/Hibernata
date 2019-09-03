@@ -17,6 +17,11 @@ namespace Hibernata
             ColumnValue = columnValue;
         }
 
+        public List<Filter> ToList()
+        {
+            return new List<Filter>() { this };
+        }
+
         public string ColumnName
         {
             get { return columnName; }

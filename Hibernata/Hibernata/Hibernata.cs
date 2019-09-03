@@ -29,35 +29,21 @@ namespace Hibernata
         #region SELECT
         public T Select(object id)
         {
-            T obj = Activator.CreateInstance<T>();
-
-            string sql =
-                sentenceSqlFrom() + 
-                "WHERE " + properties.First().Name + " = " + id.ToString();
-
-            return launchQuery(sql);
+            return Select(new Filter(properties.First().Name, id).ToList());
         }
 
         public T Select(Filter filter)
         {
-            T obj = Activator.CreateInstance<T>();
-
-            string sql =
-                sentenceSqlFrom() +
-                "WHERE " + filter.ColumnName + " = '" + filter.ColumnValue + "'";
-
-            return launchQuery(sql);
+            return Select(filter.ToList());
         }
 
         public T Select(List<Filter> filters)
         {
-            T obj = Activator.CreateInstance<T>();
-
             string sql =
                 sentenceSqlFrom() +
                 "WHERE " + separator(filters);
 
-            return launchQuery(sql); 
+            return launchQueryAll(sql).FirstOrDefault(); 
         }
         #endregion
 
@@ -66,28 +52,16 @@ namespace Hibernata
         #region SELECTALL
         public List<T> SelectAll()
         {
-            T obj = Activator.CreateInstance<T>();
-
-            string sql = sentenceSqlFrom();
-
-            return launchQueryAll(sql);
+            return launchQueryAll(sentenceSqlFrom());
         }
 
         public List<T> SelectAll(Filter filter)
         {
-            T obj = Activator.CreateInstance<T>();
-
-            string sql =
-                sentenceSqlFrom() +
-                "WHERE " + filter.ColumnName + " = '" + filter.ColumnValue + "'";
-
-            return launchQueryAll(sql);
+            return SelectAll(filter.ToList());
         }
 
         public List<T> SelectAll(List<Filter> filters)
         {
-            T obj = Activator.CreateInstance<T>();
-
             string sql =
                 sentenceSqlFrom() +
                 "WHERE " + separator(filters);
@@ -143,30 +117,8 @@ namespace Hibernata
             {
                 MySqlDataReader reader = createQuery(sql);
                 if (reader.HasRows)
-                {
                     while (reader.Read())
-                    {
-                        for (int i = 0; i < properties.Count; i++)
-                        {
-                            string typeName = properties[i].PropertyType.ToString();
-
-                            if (typeName.Contains("Int"))
-                                properties[i].SetValue(obj, reader.GetInt32(i));
-                            else if (typeName.Contains("Double"))
-                                properties[i].SetValue(obj, reader.GetDouble(i));
-                            else if (typeName.Contains("Decimal"))
-                                properties[i].SetValue(obj, reader.GetDecimal(i));
-                            else if (typeName.Contains("Float"))
-                                properties[i].SetValue(obj, reader.GetFloat(i));
-                            else if (typeName.Contains("String"))
-                                properties[i].SetValue(obj, reader.GetString(i));
-                            else if (typeName.Contains("Boolean"))
-                                properties[i].SetValue(obj, reader.GetBoolean(i));
-                            else if (typeName.Contains("DateTime"))
-                                properties[i].SetValue(obj, reader.GetDateTime(i));
-                        }
-                    }
-                }
+                        obj = fillReadedObject(reader);
             }
             catch (Exception e)
             {
@@ -186,32 +138,8 @@ namespace Hibernata
             {
                 MySqlDataReader reader = createQuery(sql);
                 if (reader.HasRows)
-                {
                     while (reader.Read())
-                    {
-                        T obj = Activator.CreateInstance<T>();
-                        for (int i = 0; i < properties.Count; i++)
-                        {
-                            string typeName = properties[i].PropertyType.ToString();
-
-                            if (typeName.Contains("Int"))
-                                properties[i].SetValue(obj, reader.GetInt32(i));
-                            else if (typeName.Contains("Double"))
-                                properties[i].SetValue(obj, reader.GetDouble(i));
-                            else if (typeName.Contains("Decimal"))
-                                properties[i].SetValue(obj, reader.GetDecimal(i));
-                            else if (typeName.Contains("Float"))
-                                properties[i].SetValue(obj, reader.GetFloat(i));
-                            else if (typeName.Contains("String"))
-                                properties[i].SetValue(obj, reader.GetString(i));
-                            else if (typeName.Contains("Boolean"))
-                                properties[i].SetValue(obj, reader.GetBoolean(i));
-                            else if (typeName.Contains("DateTime"))
-                                properties[i].SetValue(obj, reader.GetDateTime(i));
-                        }
-                        objs.Add(obj);
-                    }
-                }
+                        objs.Add(fillReadedObject(reader));
             }
             catch (Exception e)
             {
@@ -222,6 +150,31 @@ namespace Hibernata
                 closeQuery();
             }
             return objs;
+        }
+
+        private T fillReadedObject(MySqlDataReader reader)
+        {
+            T newObj = Activator.CreateInstance<T>();
+            for (int i = 0; i < properties.Count; i++)
+            {
+                string typeName = properties[i].PropertyType.ToString();
+
+                if (typeName.Contains("Int"))
+                    properties[i].SetValue(newObj, reader.GetInt32(i));
+                else if (typeName.Contains("Double"))
+                    properties[i].SetValue(newObj, reader.GetDouble(i));
+                else if (typeName.Contains("Decimal"))
+                    properties[i].SetValue(newObj, reader.GetDecimal(i));
+                else if (typeName.Contains("Float"))
+                    properties[i].SetValue(newObj, reader.GetFloat(i));
+                else if (typeName.Contains("String"))
+                    properties[i].SetValue(newObj, reader.GetString(i));
+                else if (typeName.Contains("Boolean"))
+                    properties[i].SetValue(newObj, reader.GetBoolean(i));
+                else if (typeName.Contains("DateTime"))
+                    properties[i].SetValue(newObj, reader.GetDateTime(i));
+            }
+            return newObj;
         }
         #endregion
 

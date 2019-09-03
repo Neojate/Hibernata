@@ -19,10 +19,15 @@ namespace Hibernata
 
             INataDao<platformuser> nataPlatformuser = new Hibernata<platformuser>();
 
-            foreach (var x in nataPlatformuser.SelectAll(new List<Filter>(){
-                new Filter("lastname", "Alonso"),
-                new Filter("roleId", 2) } ))
-                Console.WriteLine(x.ToString());
+            List<Filter> filters = new List<Filter>()
+            {
+                new Filter("lastname", "alonso"),
+                new Filter("roleid", 2)
+            };
+            Console.WriteLine(nataPlatformuser.Select(filters).ToString());
+
+            foreach (var x in nataPlatformuser.SelectAll())
+                //Console.WriteLine(x.ToString());
 
             Console.WriteLine("Programa terminado");
             Console.ReadLine();
