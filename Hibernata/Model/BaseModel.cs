@@ -12,12 +12,21 @@ namespace Hibernata
 
         public string Name
         {
-            get { return typeof(BaseModel).Name.Split('.').Last(); }
+            get { return GetType().Name.Split('.').Last(); }
+        }
+
+        public List<PropertyInfo> Properties
+        {
+            get { return GetType().GetProperties(
+                BindingFlags.Public |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly
+                ).ToList(); }
         }
 
         public List<string> PropertyNames
         {
-            get { return typeof(BaseModel).GetProperties().Select(x => x.Name).ToList(); }
+            get { return Properties.Select(x => x.Name).ToList(); }
         }
     }
 }

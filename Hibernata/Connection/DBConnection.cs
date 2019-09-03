@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hibernata
+namespace Hibernata.Connection
 {
-    public class NataConnection
+    public class DBConnection
     {
 
         private static MySqlConnection connection = null;
@@ -20,7 +20,7 @@ namespace Hibernata
         private static string stringConnection;
 
 
-        private NataConnection()
+        private DBConnection()
         {
 
         }
@@ -31,24 +31,22 @@ namespace Hibernata
                 throw new NataException(NataException.NO_NULL_CREDENTIALS);
 
             stringConnection =
-                "Server=127.0.0.1; " +
-                "port=3306; " +
+                "Server=localhost; " +
+                "database=" + databaseName + "; " +
                 "username=" + userName + "; " +
-                "password=" + password + ";" +
-                "database=" + databaseName;
+                "password=" + password;
         }
 
-        public static void CreateBridge(string url, string port, string databaseName, string userName, string password)
+        public static void CreateBridge(string url, string databaseName, string userName, string password)
         {
             if (url == null || databaseName == null || userName == null || password == null)
                 throw new NataException(NataException.NO_NULL_CREDENTIALS);
 
             stringConnection =
-                "datasource=" + url + "; " +
-                "port=" + port + ";" +
+                "Server=" + url + "; " +
+                "database=" + databaseName + "; " +
                 "username=" + userName + "; " +
-                "password=" + password + ";" + 
-                "database=" + databaseName;
+                "password=" + password;
         }
 
         public static MySqlConnection OpenConnection()
