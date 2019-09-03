@@ -8,9 +8,20 @@ namespace Hibernata
 {
     public interface INataDao<T>
     {
+
+        #region SELECT
         T Select(object id);
         T Select(Filter filter);
         T Select(List<Filter> filters);
+        #endregion
+
+
+
+        #region SELECTALL
+        List<T> SelectAll();
+        List<T> SelectAll(Filter filter);
+        List<T> SelectAll(List<Filter> filters);
+        #endregion
 
     }
 }

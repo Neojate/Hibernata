@@ -8,18 +8,19 @@ namespace Hibernata
 {
     public class Filter
     {
+        private string columnName;
         private string columnValue;
 
-        public Filter(string ColumnName, object columnValue)
+        public Filter(string columnName, object columnValue)
         {
-            this.ColumnName = ColumnName;
-            this.columnValue = columnValue.ToString();
+            ColumnName = columnName;
+            ColumnValue = columnValue;
         }
 
         public string ColumnName
         {
-            get { return ColumnName; }
-            set { ColumnName = value; }
+            get { return columnName; }
+            set { columnName = value; }
         }
 
         public object ColumnValue

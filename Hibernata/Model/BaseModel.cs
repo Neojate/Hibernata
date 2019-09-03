@@ -28,5 +28,13 @@ namespace Hibernata
         {
             get { return Properties.Select(x => x.Name).ToList(); }
         }
+
+        public override string ToString()
+        {
+            string text = "";
+            foreach (var p in Properties)
+                text += p.Name + ": " + p.GetValue(this) + "\n";
+            return text;
+        }
     }
 }

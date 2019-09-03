@@ -13,8 +13,16 @@ namespace Hibernata
         {
             NataConnection.CreateBridge("bdmarianflix", "albert", "");
 
-            INataDao<category> nataDao = new Hibernata<category>();
-            Console.WriteLine(nataDao.Select(1).Name);
+            INataDao<category> nataCategory = new Hibernata<category>();
+
+            Console.WriteLine(nataCategory.Select(new Filter("categoryName", "Accion")).ToString());
+
+            INataDao<platformuser> nataPlatformuser = new Hibernata<platformuser>();
+
+            foreach (var x in nataPlatformuser.SelectAll(new List<Filter>(){
+                new Filter("lastname", "Alonso"),
+                new Filter("roleId", 2) } ))
+                Console.WriteLine(x.ToString());
 
             Console.WriteLine("Programa terminado");
             Console.ReadLine();

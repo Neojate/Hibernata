@@ -72,6 +72,7 @@
     <Compile Include="Model\Filter.cs" />
     <Compile Include="Model\Prueba\category.cs" />
     <Compile Include="Model\Prueba\Persona.cs" />
+    <Compile Include="Model\Prueba\platformuser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
