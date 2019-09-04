@@ -23,5 +23,13 @@ namespace Hibernata
         List<T> SelectAll(List<Filter> filters);
         #endregion
 
+
+
+        #region INSERT
+        int Insert(T obj);
+
+        int Insert(List<T> objs);
+        #endregion
+
     }
 }

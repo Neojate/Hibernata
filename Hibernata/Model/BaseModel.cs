@@ -10,6 +10,19 @@ namespace Hibernata
     public abstract class BaseModel
     {
 
+        public List<BaseModel> ToList()
+        {
+            return new List<BaseModel>() { this };
+        }
+
+        public override string ToString()
+        {
+            string text = "";
+            foreach (var p in Properties)
+                text += p.Name + ": " + p.GetValue(this) + "\n";
+            return text;
+        }
+
         public string Name
         {
             get { return GetType().Name.Split('.').Last(); }
@@ -29,12 +42,5 @@ namespace Hibernata
             get { return Properties.Select(x => x.Name).ToList(); }
         }
 
-        public override string ToString()
-        {
-            string text = "";
-            foreach (var p in Properties)
-                text += p.Name + ": " + p.GetValue(this) + "\n";
-            return text;
-        }
     }
 }

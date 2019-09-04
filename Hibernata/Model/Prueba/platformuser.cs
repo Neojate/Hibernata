@@ -13,6 +13,6 @@ namespace Hibernata
         public string firstname { get; set; }
         public string lastname { get; set; }
         public string mailAdress { get; set; }
-        public string roleId { get; set; }
+        public int roleId { get; set; }
     }
 }

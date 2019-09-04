@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 namespace Hibernata
 {
 
+    public enum CrudType
+    {
+        Select, Insert
+    }
+
     public class Hibernata<T> : INataDao<T>  where T : BaseModel
     {
 
@@ -22,6 +27,7 @@ namespace Hibernata
         {
             obj = Activator.CreateInstance<T>();
             properties = obj.Properties;
+            connection = NataConnection.OpenConnection();
         }
 
 
@@ -40,7 +46,7 @@ namespace Hibernata
         public T Select(List<Filter> filters)
         {
             string sql =
-                sentenceSqlFrom() +
+                sentenceSqlFrom(CrudType.Select) +
                 "WHERE " + separator(filters);
 
             return launchQueryAll(sql).FirstOrDefault(); 
@@ -52,7 +58,7 @@ namespace Hibernata
         #region SELECTALL
         public List<T> SelectAll()
         {
-            return launchQueryAll(sentenceSqlFrom());
+            return launchQueryAll(sentenceSqlFrom(CrudType.Select));
         }
 
         public List<T> SelectAll(Filter filter)
@@ -63,7 +69,7 @@ namespace Hibernata
         public List<T> SelectAll(List<Filter> filters)
         {
             string sql =
-                sentenceSqlFrom() +
+                sentenceSqlFrom(CrudType.Select) +
                 "WHERE " + separator(filters);
 
             return launchQueryAll(sql);
@@ -72,10 +78,34 @@ namespace Hibernata
 
 
 
+        #region INSERT
+        public int Insert(T obj)
+        {
+            string sql =
+                sentenceSqlFrom(CrudType.Insert) + 
+                "VALUES (" + separator(properties.Select(x => "@" + x.Name).ToList()) + ")";
+
+            return 0;//launchTransaction(sql, obj.ToList());    
+        }
+
+        public int Insert(List<T> objs)
+        {
+            string sql = 
+                sentenceSqlFrom(CrudType.Insert) +
+                "VALUES ";
+            for (int i = 0; i < objs.Count - 1; i++)
+                sql += "(" + separator(properties.Select(x => "@" + x.Name).ToList()) + "), ";
+            sql += "(" + separator(properties.Select(x => "@" + x.Name).ToList()) + ")";
+
+            return launchTransaction(sql, objs);
+        }
+        #endregion
+
+
+
         #region MÉTODOS PRIVADOS
         private MySqlDataReader createQuery(string sql)
         {
-            connection = NataConnection.OpenConnection();
             connection.Open();
             MySqlCommand cmd = new MySqlCommand(sql, connection);
             return cmd.ExecuteReader();
@@ -85,6 +115,18 @@ namespace Hibernata
         {
             if (connection != null)
                 NataConnection.CloseConnection();
+        }
+
+        private MySqlCommand createTransaction(string sql)
+        {
+            connection = NataConnection.OpenConnection();
+            connection.Open();
+            return new MySqlCommand(sql, connection);
+        }
+
+        private bool checkFilters(List<Filter> filters)
+        {
+            return true;
         }
 
         private string separator(List<string> objs)
@@ -106,9 +148,19 @@ namespace Hibernata
             return text;
         }
 
-        private string sentenceSqlFrom()
+        private string sentenceSqlFrom(CrudType type)
         {
-            return "SELECT * FROM " + obj.Name + " ";
+            string sqlBegin = "";
+            switch(type)
+            {
+                case CrudType.Select:
+                    sqlBegin = "SELECT * ";
+                    break;
+                case CrudType.Insert:
+                    sqlBegin = "INSERT INTO ";
+                    break;
+            }
+            return sqlBegin + "FROM " + obj.Name + " ";
         }
 
         private T launchQuery(string sql)
@@ -150,6 +202,36 @@ namespace Hibernata
                 closeQuery();
             }
             return objs;
+        }
+        
+        private int launchTransaction(string sql, List<T> objs)
+        {
+            int result = 0;
+            MySqlTransaction tx = null;
+
+            try
+            {
+                MySqlCommand cmd = createTransaction(sql);
+                tx = connection.BeginTransaction();
+
+                foreach (BaseModel b in objs)
+                    foreach (var p in properties)
+                        cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(b));
+
+                result = cmd.ExecuteNonQuery();
+                tx.Commit();
+            }
+            catch (Exception e)
+            {
+                if (result != objs.Count)
+                    tx.Rollback();
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                closeQuery();
+            }
+            return result;
         }
 
         private T fillReadedObject(MySqlDataReader reader)

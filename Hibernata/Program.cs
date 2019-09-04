@@ -26,8 +26,15 @@ namespace Hibernata
             };
             Console.WriteLine(nataPlatformuser.Select(filters).ToString());
 
-            foreach (var x in nataPlatformuser.SelectAll())
-                //Console.WriteLine(x.ToString());
+            //foreach (var x in nataPlatformuser.SelectAll())
+            //Console.WriteLine(x.ToString());
+
+            List<platformuser> platformusers = new List<platformuser>()
+            {
+                new platformuser() { userID = "J", password = "K", firstname = "F", lastname = "G", mailAdress = "H", roleId = 2 },
+                new platformuser() { userID = "X", password = "Y", firstname = "Z", lastname = "W", mailAdress = "V", roleId = 2 }
+            };
+            nataPlatformuser.Insert(platformusers);
 
             Console.WriteLine("Programa terminado");
             Console.ReadLine();
