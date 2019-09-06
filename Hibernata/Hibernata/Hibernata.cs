@@ -14,7 +14,7 @@ namespace Hibernata
         Select, Insert
     }
 
-    public class Hibernata<T> : INataDao<T>  where T : BaseModel
+    public class Hibernata<T> : PrimaryNataMethods, INataDao<T>  where T : BaseModel
     {
 
         T obj = default(T);
@@ -101,10 +101,16 @@ namespace Hibernata
         }
         #endregion
 
+        
+        public List<string> ShowTables()
+        {
+            return null;
+        }
+
 
 
         #region MÉTODOS PRIVADOS
-        private MySqlDataReader createQuery(string sql)
+        /*private MySqlDataReader createQuery(string sql)
         {
             connection.Open();
             MySqlCommand cmd = new MySqlCommand(sql, connection);
@@ -122,7 +128,7 @@ namespace Hibernata
             connection = NataConnection.OpenConnection();
             connection.Open();
             return new MySqlCommand(sql, connection);
-        }
+        }*/
 
         private bool checkFilters(List<Filter> filters)
         {

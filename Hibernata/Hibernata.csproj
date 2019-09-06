@@ -67,7 +67,9 @@
     <Compile Include="Connection\NataConnection.cs" />
     <Compile Include="Exception\NataException.cs" />
     <Compile Include="Hibernata\Hibernata.cs" />
+    <Compile Include="Hibernata\NataFactory.cs" />
     <Compile Include="Hibernata\INataDao.cs" />
+    <Compile Include="Hibernata\PrimaryNataMethods.cs" />
     <Compile Include="Model\BaseModel.cs" />
     <Compile Include="Model\Filter.cs" />
     <Compile Include="Model\Prueba\category.cs" />

@@ -31,5 +31,7 @@ namespace Hibernata
         int Insert(List<T> objs);
         #endregion
 
+        List<string> ShowTables();
+
     }
 }

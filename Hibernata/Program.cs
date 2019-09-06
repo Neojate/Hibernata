@@ -13,7 +13,11 @@ namespace Hibernata
         {
             NataConnection.CreateBridge("bdmarianflix", "albert", "");
 
-            INataDao<category> nataCategory = new Hibernata<category>();
+            NataFactory entity = new NataFactory();
+
+            entity.CreateBaseModel();
+
+            /*INataDao<category> nataCategory = new Hibernata<category>();
 
             Console.WriteLine(nataCategory.Select(new Filter("categoryName", "Accion")).ToString());
 
@@ -34,7 +38,7 @@ namespace Hibernata
                 new platformuser() { userID = "J", password = "K", firstname = "F", lastname = "G", mailAdress = "H", roleId = 2 },
                 new platformuser() { userID = "X", password = "Y", firstname = "Z", lastname = "W", mailAdress = "V", roleId = 2 }
             };
-            nataPlatformuser.Insert(platformusers);
+            nataPlatformuser.Insert(platformusers);*/
 
             Console.WriteLine("Programa terminado");
             Console.ReadLine();
