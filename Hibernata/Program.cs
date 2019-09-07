@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Hibernata.Model;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,32 @@ namespace Hibernata
     {
         static void Main(string[] args)
         {
+
             NataConnection.CreateBridge("bdmarianflix", "albert", "");
 
-            NataFactory entity = new NataFactory();
+            NataFactory factory = new NataFactory();
 
-            entity.CreateBaseModel();
+            try
+            {
+                factory.CreateBaseModel("Hibernata");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            INataDao<watchedlist> nataWatched = new Hibernata<watchedlist>();
+
+            try
+            {
+                foreach (var x in nataWatched.SelectAll(new Filter("userid", "Alonsus")))
+                    Console.WriteLine(x.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
 
             /*INataDao<category> nataCategory = new Hibernata<category>();
 

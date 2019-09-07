@@ -12,52 +12,46 @@ namespace Hibernata
 
         private static MySqlConnection connection = null;
 
-        public string Url { get; set; }
-        public string DataBaseName { get; set; }
-        public string UserName { get; set; }
+        public static string Url { get; set; }
+        public static string Port { get; set; }
+        public static string DataBaseName { get; set; }
+        public static string UserName { get; set; }
         public static string Password { get; set; }
-
-        private static string stringConnection;
+        public static string StringConnection { get; private set; }
 
 
         private NataConnection()
         {
-
+            
         }
+
 
         public static void CreateBridge(string databaseName, string userName, string password)
         {
-            if (databaseName == null || userName == null || password == null)
-                throw new NataException(NataException.NO_NULL_CREDENTIALS);
-
-            stringConnection =
-                "Server=127.0.0.1; " +
-                "port=3306; " +
-                "username=" + userName + "; " +
-                "password=" + password + ";" +
-                "database=" + databaseName;
+            Url = "server=127.0.0.1;";
+            Port = "port=3306;";
+            DataBaseName = "database=" + databaseName + ";";
+            UserName = "username=" + userName + ";";
+            Password = "password=" + password + ";";
         }
 
         public static void CreateBridge(string url, string port, string databaseName, string userName, string password)
         {
-            if (url == null || databaseName == null || userName == null || password == null)
-                throw new NataException(NataException.NO_NULL_CREDENTIALS);
-
-            stringConnection =
-                "datasource=" + url + "; " +
-                "port=" + port + ";" +
-                "username=" + userName + "; " +
-                "password=" + password + ";" + 
-                "database=" + databaseName;
+            CreateBridge(databaseName, userName, password);
+            Url = "server=" + url + ";";
+            Port = "port=" + port + ";";
         }
 
         public static MySqlConnection OpenConnection()
         {
-            if (stringConnection == null)
+            if (Url == null)
                 throw new NataException(NataException.NO_BRIDGED_CREATED);
 
+            StringConnection = Url + Port + UserName + Password + DataBaseName;
+
             if (connection == null)
-                connection = new MySqlConnection(stringConnection);
+                connection = new MySqlConnection(StringConnection);
+
             return connection;
         }
 

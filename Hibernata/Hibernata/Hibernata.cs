@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Hibernata.Model;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,8 @@ namespace Hibernata
 
         public T Select(List<Filter> filters)
         {
+            checkFilters(filters);
+
             string sql =
                 sentenceSqlFrom(CrudType.Select) +
                 "WHERE " + separator(filters);
@@ -68,6 +71,8 @@ namespace Hibernata
 
         public List<T> SelectAll(List<Filter> filters)
         {
+            checkFilters(filters);
+
             string sql =
                 sentenceSqlFrom(CrudType.Select) +
                 "WHERE " + separator(filters);
@@ -100,39 +105,16 @@ namespace Hibernata
             return launchTransaction(sql, objs);
         }
         #endregion
-
         
-        public List<string> ShowTables()
-        {
-            return null;
-        }
-
 
 
         #region MÉTODOS PRIVADOS
-        /*private MySqlDataReader createQuery(string sql)
-        {
-            connection.Open();
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            return cmd.ExecuteReader();
-        }
-
-        private void closeQuery()
-        {
-            if (connection != null)
-                NataConnection.CloseConnection();
-        }
-
-        private MySqlCommand createTransaction(string sql)
-        {
-            connection = NataConnection.OpenConnection();
-            connection.Open();
-            return new MySqlCommand(sql, connection);
-        }*/
-
         private bool checkFilters(List<Filter> filters)
         {
-            return true;
+            foreach (string f in filters.Select(x => x.ColumnName))
+                if (properties.FirstOrDefault(p => p.Name.Equals(f, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    throw new NataException(NataException.NO_FILTER_RECIPROCATION);
+            return true;   
         }
 
         private string separator(List<string> objs)

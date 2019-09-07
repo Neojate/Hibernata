@@ -45,7 +45,7 @@ namespace Hibernata
             }
             catch (Exception e)
             {
-                throw new Exception("Error a la hora de abrir la conexión.");
+                Console.WriteLine("Error a la hora de abrir la conexión.");
             }
         }
         

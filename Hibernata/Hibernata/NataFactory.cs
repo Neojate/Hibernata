@@ -11,14 +11,15 @@ namespace Hibernata
     public class NataFactory : PrimaryNataMethods
     {
 
-        MySqlConnection connection = null; 
+        protected MySqlConnection connection = null;
+        
 
         public NataFactory()
         {
             connection = NataConnection.OpenConnection();
         }
 
-        public void CreateBaseModel()
+        public void CreateBaseModel(string namespaceName)
         {
             List<string> tables = new List<string>();
             MySqlDataReader reader = null;
@@ -40,12 +41,12 @@ namespace Hibernata
  
                 closeQuery();
 
-                createFileModel(s, columns);
+                createFileModel(namespaceName, s, columns);
             }
             
         }
 
-        private void createFileModel(string name, List<object[]> columns)
+        private void createFileModel(string namespaceName, string name, List<object[]> columns)
         {
             string dir = "Model";
             string fileName = name + ".txt";
@@ -58,15 +59,16 @@ namespace Hibernata
 
             string body = "";
 
-            body += "using Hibernata\n\n";
-            body += "namespace Model\n";
+            body += "using System;\n";
+            body += "using Hibernata.Model;\n\n";
+            body += "namespace " + namespaceName + ".Model\n";
             body += "{\n";
 
             body += "\tpublic class " + name + " : BaseModel\n";
             body += "\t{\n";
 
             foreach (var c in columns)
-                body += "\t\tpublic " + c[1].ToString() + " " + c[0].ToString() + " { get; set; }\n"; 
+                body += "\t\tpublic " + translateSqlType(c[1].ToString()) + " " + c[0].ToString() + " { get; set; }\n"; 
 
             body += "\t}\n";
 
@@ -85,6 +87,34 @@ namespace Hibernata
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        private string translateSqlType(string sql)
+         {
+            if (sql.Contains("tinyint(1)"))
+                return "bool";
+
+            if (sql.Contains("bigint"))
+                return "long";
+            if (sql.Contains("int("))
+                return "int";
+            if (sql.Contains("decimal"))
+                return "decimal";
+            if (sql.Contains("float"))
+                return "float";
+            if (sql.Contains("double"))
+                return "double";
+
+            if (sql.Contains("varchar(") || sql.Contains("text"))
+                return "string";
+            if (sql.Contains("char"))
+                return "char";
+
+            if (sql.Contains("date"))
+                return "DateTime";
+
+            throw new Exception("No se ha encontrado el tipo.");
+
         }
 
 

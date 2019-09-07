@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hibernata
+namespace Hibernata.Model
 {
     public abstract class BaseModel
     {

@@ -63,7 +63,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connection\DBConnection.cs" />
     <Compile Include="Connection\NataConnection.cs" />
     <Compile Include="Exception\NataException.cs" />
     <Compile Include="Hibernata\Hibernata.cs" />
@@ -75,6 +74,7 @@
     <Compile Include="Model\Prueba\category.cs" />
     <Compile Include="Model\Prueba\Persona.cs" />
     <Compile Include="Model\Prueba\platformuser.cs" />
+    <Compile Include="Model\Prueba\watchedlist.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
