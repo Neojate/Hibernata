@@ -38,6 +38,19 @@ namespace Hibernata
                 Console.WriteLine(e);
             }
 
+            INataDao<platformuser> nataPlatform = new Hibernata<platformuser>();
+
+            try
+            {
+                platformuser p = new platformuser("jorl2", "aaaa", "Uno", "Dosdos", "admjkin@admin.com", 18);
+                nataPlatform.Insert(p);
+
+                Console.WriteLine(nataPlatform.Select(new Filter("password", "aaaa")).ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
             /*INataDao<category> nataCategory = new Hibernata<category>();
 

@@ -14,6 +14,9 @@ namespace Hibernata
 
         public static string NO_FILTER_RECIPROCATION = "Los filtros establecidos no coinciden con los campos del BaseModel.";
 
+        public static string INSERT_DUPLICATED_KEY = "Imposible insertar elemento. La clave primaria no puede duplicarse.";
+        public static string INSERT_NO_FOREIGNKEY = "Imposible insertar elemento. Revise que la clave foranea exista.";
+
         public NataException(string message) : base(message)
         {
 

@@ -10,11 +10,6 @@ namespace Hibernata.Model
     public abstract class BaseModel
     {
 
-        public List<BaseModel> ToList()
-        {
-            return new List<BaseModel>() { this };
-        }
-
         public override string ToString()
         {
             string text = "";

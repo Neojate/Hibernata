@@ -48,7 +48,26 @@ namespace Hibernata
                 Console.WriteLine("Error a la hora de abrir la conexión.");
             }
         }
-        
+
+        protected string separator(List<string> objs)
+        {
+            string text = "";
+            for (int i = 0; i < objs.Count - 1; i++)
+                text += objs[i] + ", ";
+            text += objs.Last();
+
+            return text;
+        }
+
+        protected string separator(List<Filter> objs)
+        {
+            string text = "";
+            for (int i = 0; i < objs.Count - 1; i++)
+                text += objs[i].ColumnName + " = '" + objs[i].ColumnValue + "' AND ";
+            text += objs.Last().ColumnName + " = '" + objs.Last().ColumnValue + "'";
+            return text;
+        }
+
 
     }
 }

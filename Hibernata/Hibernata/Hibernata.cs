@@ -90,7 +90,7 @@ namespace Hibernata
                 sentenceSqlFrom(CrudType.Insert) + 
                 "VALUES (" + separator(properties.Select(x => "@" + x.Name).ToList()) + ")";
 
-            return 0;//launchTransaction(sql, obj.ToList());    
+            return launchTransaction(sql, new List<T>() { obj });    
         }
 
         public int Insert(List<T> objs)
@@ -117,38 +117,19 @@ namespace Hibernata
             return true;   
         }
 
-        private string separator(List<string> objs)
-        {
-            string text = "";
-            for (int i = 0; i < objs.Count - 1; i++)
-                text += objs[i] + ", ";
-            text += objs.Last();
-
-            return text;
-        }
-
-        private string separator(List<Filter> objs)
-        {
-            string text = "";
-            for (int i = 0; i < objs.Count - 1; i++)
-                text += objs[i].ColumnName + " = '" + objs[i].ColumnValue + "' AND ";
-            text += objs.Last().ColumnName + " = '" + objs.Last().ColumnValue + "'"; 
-            return text;
-        }
-
         private string sentenceSqlFrom(CrudType type)
         {
             string sqlBegin = "";
             switch(type)
             {
                 case CrudType.Select:
-                    sqlBegin = "SELECT * ";
+                    sqlBegin = "SELECT * FROM ";
                     break;
                 case CrudType.Insert:
                     sqlBegin = "INSERT INTO ";
                     break;
             }
-            return sqlBegin + "FROM " + obj.Name + " ";
+            return sqlBegin + obj.Name + " ";
         }
 
         private T launchQuery(string sql)
@@ -202,13 +183,29 @@ namespace Hibernata
                 MySqlCommand cmd = createTransaction(sql);
                 tx = connection.BeginTransaction();
 
-                foreach (BaseModel b in objs)
+                foreach (var o in objs)
                     foreach (var p in properties)
-                        cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(b));
+                        cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(o));
 
                 result = cmd.ExecuteNonQuery();
                 tx.Commit();
             }
+            catch (MySqlException e)
+            {
+                string error = "";
+                switch (e.Number)
+                {
+                    case 1062:
+                        error = NataException.INSERT_DUPLICATED_KEY;
+                        break;
+                    case 1452:
+                        error = NataException.INSERT_NO_FOREIGNKEY;
+                        break;
+                }
+                tx.Rollback();
+                throw new NataException(error);
+            }
+
             catch (Exception e)
             {
                 if (result != objs.Count)

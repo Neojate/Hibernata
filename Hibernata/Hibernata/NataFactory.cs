@@ -55,7 +55,7 @@ namespace Hibernata
                 Directory.CreateDirectory(dir);
             else
                 if (!File.Exists(dir + "\\" + fileName))
-                    File.Delete(dir + "\\" + fileName);
+                File.Delete(dir + "\\" + fileName);
 
             string body = "";
 
@@ -68,7 +68,21 @@ namespace Hibernata
             body += "\t{\n";
 
             foreach (var c in columns)
-                body += "\t\tpublic " + translateSqlType(c[1].ToString()) + " " + c[0].ToString() + " { get; set; }\n"; 
+                body += "\t\tpublic " + translateSqlType(c[1].ToString()) + " " + c[0].ToString() + " { get; set; }\n";
+
+            body += "\n\t\tpublic " + name + "()\n";
+            body += "\t\t{\n\n";
+            body += "\t\t}\n\n";
+
+            List<string> parameters = new List<string>();
+            foreach (var c in columns)
+                parameters.Add(translateSqlType(c[1].ToString()) + " " + c[0].ToString());
+            body += "\t\tpublic " + name + "(" + separator(parameters) + ")\n";
+            body += "\t\t{\n";
+            foreach (var c in columns)
+                body += "\t\t\tthis." + c[0].ToString() + " = " + c[0].ToString() + ";\n";
+            body += "\t\t}\n\n";
+            
 
             body += "\t}\n";
 
