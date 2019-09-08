@@ -192,18 +192,8 @@ namespace Hibernata
             }
             catch (MySqlException e)
             {
-                string error = "";
-                switch (e.Number)
-                {
-                    case 1062:
-                        error = NataException.INSERT_DUPLICATED_KEY;
-                        break;
-                    case 1452:
-                        error = NataException.INSERT_NO_FOREIGNKEY;
-                        break;
-                }
                 tx.Rollback();
-                throw new NataException(error);
+                throw new NataException(GetNataErrorMessage(e.Number));
             }
 
             catch (Exception e)

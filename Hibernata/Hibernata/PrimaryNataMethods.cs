@@ -13,6 +13,12 @@ namespace Hibernata
 
         private MySqlConnection connection = null;
 
+        private Dictionary<int, string> nataCodeErrors = new Dictionary<int, string>()
+        {
+            { 1062, NataException.INSERT_DUPLICATED_KEY },
+            { 1452, NataException.INSERT_NO_FOREIGNKEY }
+        };
+
         public PrimaryNataMethods()
         {
             connection = NataConnection.OpenConnection();
@@ -37,16 +43,9 @@ namespace Hibernata
                 connection.Close();
         }
 
-        private void tryOpenConnection()
+        protected string GetNataErrorMessage(int i)
         {
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error a la hora de abrir la conexión.");
-            }
+            return nataCodeErrors[i];
         }
 
         protected string separator(List<string> objs)
@@ -67,6 +66,20 @@ namespace Hibernata
             text += objs.Last().ColumnName + " = '" + objs.Last().ColumnValue + "'";
             return text;
         }
+
+        private void tryOpenConnection()
+        {
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error a la hora de abrir la conexión.");
+            }
+        }
+
+
 
 
     }
