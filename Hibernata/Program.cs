@@ -42,10 +42,10 @@ namespace Hibernata
 
             try
             {
-                platformuser p = new platformuser("jorl2", "aaaa", "Uno", "Dosdos", "admjkin@admin.com", 18);
-                nataPlatform.Insert(p);
+                platformuser p = new platformuser("CuentaUsuario", "aaaa", "Uno", "Dosdos", "admjkin@admin.com", 2);
+                //nataPlatform.Insert(p);
 
-                Console.WriteLine(nataPlatform.Select(new Filter("password", "aaaa")).ToString());
+                Console.WriteLine(nataPlatform.Select(new Filter("passwordx", "aaaa")).ToString());
             }
             catch (Exception e)
             {

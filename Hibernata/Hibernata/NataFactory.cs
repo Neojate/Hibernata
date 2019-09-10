@@ -37,7 +37,10 @@ namespace Hibernata
 
                 reader = createQuery("describe " + s);
                 while (reader.Read())
+                {
                     columns.Add(new object[] { reader.GetString(0), reader.GetString(1) });
+                }
+                    
  
                 closeQuery();
 
