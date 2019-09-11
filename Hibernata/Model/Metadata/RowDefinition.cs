@@ -17,6 +17,11 @@ namespace Hibernata.Model
         public bool IsAutoIncremental { get; set; }
         public ForeignDefinition ForeignKey { get; set; }
 
+        public RowDefinition()
+        {
+
+        }
+
         public RowDefinition(string field, string type, bool isNullable, string key, string defaultValue, bool isAutoIncremental, ForeignDefinition foreignKey)
         {
             Field = field;
@@ -28,5 +33,6 @@ namespace Hibernata.Model
             ForeignKey = foreignKey;
         }
 
+        
     }
 }

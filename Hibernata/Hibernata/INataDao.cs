@@ -27,8 +27,13 @@ namespace Hibernata
 
         #region INSERT
         int Insert(T obj);
-
         int Insert(List<T> objs);
+        #endregion
+
+
+
+        #region UPDATE
+
         #endregion
 
     }

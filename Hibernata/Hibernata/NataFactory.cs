@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Hibernata.Model;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,8 @@ namespace Hibernata
     {
 
         protected MySqlConnection connection = null;
+
+        private List<string> tables = new List<string>();
         
 
         public NataFactory()
@@ -21,7 +24,6 @@ namespace Hibernata
 
         public void CreateBaseModel(string namespaceName)
         {
-            List<string> tables = new List<string>();
             MySqlDataReader reader = null;
 
             reader = createQuery("show tables");
@@ -31,25 +33,109 @@ namespace Hibernata
 
             closeQuery();
 
-            foreach (string s in tables)
+            foreach (string t in tables)
+            {
+                TableDefinition tableDef = new TableDefinition();
+
+                tableDef.Rows = createRowDefinitionQuery(t);
+
+                foreach (RowDefinition r in tableDef.Rows.Where(x => x.Key != null))
+                    r.ForeignKey = createForeignDefinition(t, r.Field);
+
+                tableDef.SaveTableData(t);
+
+                createFileModel(namespaceName, t, tableDef.Rows);
+            }
+
+            /*foreach (string s in tables)
             {
                 List<object[]> columns = new List<object[]>();
 
                 reader = createQuery("describe " + s);
+
+                TableDefinition tableDefinition = new TableDefinition();
+
                 while (reader.Read())
                 {
                     columns.Add(new object[] { reader.GetString(0), reader.GetString(1) });
+                    RowDefinition rowDef = new RowDefinition(
+                        reader.GetString(0),
+                        reader.GetString(1),
+                        false,
+                        reader.GetString(3),
+                        null,
+                        reader.GetString(5).Contains("increment") ? true : false,
+                        null);
+                    tableDefinition.AddRow(rowDef);
                 }
-                    
- 
+
                 closeQuery();
 
+                tableDefinition.SaveTableData(s);
+
                 createFileModel(namespaceName, s, columns);
-            }
+            }*/
             
         }
 
-        private void createFileModel(string namespaceName, string name, List<object[]> columns)
+        private void createXmlModel(TableDefinition tableDef)
+        {
+
+        }
+
+        private List<RowDefinition> createRowDefinitionQuery(string tableName)
+        {
+            List<RowDefinition> rows = new List<RowDefinition>();
+            MySqlDataReader reader = createQuery("describe " + tableName);
+
+            while (reader.Read())
+            {
+                RowDefinition row = new RowDefinition(
+                    reader.GetString(0),
+                    reader.GetString(1),
+                    reader.GetString(2).Equals("YES") ? true : false,
+                    reader.GetString(3),
+                    null,
+                    reader.GetString(5).Contains("auto_increment") ? true : false,
+                    null);
+                rows.Add(row);
+            }
+            closeQuery();
+
+            return rows;
+        }
+
+        private ForeignDefinition createForeignDefinition(string tableName, string columnName)
+        {
+            string sql =
+                "SELECT U.REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, UPDATE_RULE, DELETE_RULE " +
+                "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE U " +
+                "LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C " +
+                "ON U.CONSTRAINT_NAME = C.CONSTRAINT_NAME " +
+                "WHERE C.TABLE_NAME = '" + tableName + "' AND " +
+                "COLUMN_NAME = '" + columnName + "'";
+
+            MySqlDataReader reader = createQuery(sql);
+
+            ForeignDefinition foreignDef = null;
+
+            while (reader.Read())
+            {
+                foreignDef = new ForeignDefinition(
+                    reader.GetString(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    reader.GetString(3));
+            }
+
+            closeQuery();
+
+            return foreignDef;
+        } 
+
+
+
+        private void createFileModel(string namespaceName, string name, List<RowDefinition> columns)
         {
             string dir = "Model";
             string fileName = name + ".txt";
@@ -71,7 +157,7 @@ namespace Hibernata
             body += "\t{\n";
 
             foreach (var c in columns)
-                body += "\t\tpublic " + translateSqlType(c[1].ToString()) + " " + c[0].ToString() + " { get; set; }\n";
+                body += "\t\tpublic " + translateSqlType(c.Type) + " " + c.Field + " { get; set; }\n";
 
             body += "\n\t\tpublic " + name + "()\n";
             body += "\t\t{\n\n";
@@ -79,11 +165,11 @@ namespace Hibernata
 
             List<string> parameters = new List<string>();
             foreach (var c in columns)
-                parameters.Add(translateSqlType(c[1].ToString()) + " " + c[0].ToString());
+                parameters.Add(translateSqlType(c.Type) + " " + c.Field);
             body += "\t\tpublic " + name + "(" + separator(parameters) + ")\n";
             body += "\t\t{\n";
             foreach (var c in columns)
-                body += "\t\t\tthis." + c[0].ToString() + " = " + c[0].ToString() + ";\n";
+                body += "\t\t\tthis." + c.Field + " = " + c.Field + ";\n";
             body += "\t\t}\n\n";
             
 

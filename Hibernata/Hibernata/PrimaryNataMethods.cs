@@ -79,6 +79,11 @@ namespace Hibernata
             }
         }
 
+        protected void readXml(string fileName)
+        {
+
+        }
+
 
 
 

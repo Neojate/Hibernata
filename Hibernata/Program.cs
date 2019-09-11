@@ -30,8 +30,8 @@ namespace Hibernata
 
             try
             {
-                foreach (var x in nataWatched.SelectAll(new Filter("userid", "Alonsus")))
-                    Console.WriteLine(x.ToString());
+                watchedlist w = new watchedlist(1, "Alonsus", 5, new DateTime(), 5);
+                nataWatched.Insert(w);
             }
             catch (Exception e)
             {

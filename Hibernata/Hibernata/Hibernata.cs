@@ -86,9 +86,15 @@ namespace Hibernata
         #region INSERT
         public int Insert(T obj)
         {
-            string sql =
-                sentenceSqlFrom(CrudType.Insert) + 
-                "VALUES (" + separator(properties.Select(x => "@" + x.Name).ToList()) + ")";
+            TableDefinition tb = new TableDefinition().LoadTableData(obj.Name);
+
+            string AIproperty = "";
+
+            foreach (var p in tb.Rows.Where(x => x.IsAutoIncremental))
+                AIproperty = p.Field;
+
+            string sql = "INSERT INTO " + obj.Name + " (" + separator(obj.PropertyNames.Where(x => !x.Equals(AIproperty)).ToList()) + ") " +
+                "VALUES (" + separator(obj.Properties.Where(x => !x.Name.Equals(AIproperty)).Select(x => "@" + x.Name).ToList()) + ")";
 
             return launchTransaction(sql, new List<T>() { obj });    
         }

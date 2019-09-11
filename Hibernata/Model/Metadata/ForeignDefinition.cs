@@ -10,12 +10,22 @@ namespace Hibernata.Model
     {
         public string TableAim { get; set; }
         public string ColumnAim { get; set; }
+        public string UpdateRule { get; set; }
+        public string DeleteRule { get; set; }
 
-        public ForeignDefinition(string tableAim, string columnAim)
+        public ForeignDefinition()
+        {
+
+        }
+
+        public ForeignDefinition(string tableAim, string columnAim, string updateRule, string deleteRule)
         {
             TableAim = tableAim;
             ColumnAim = columnAim;
+            UpdateRule = updateRule;
+            DeleteRule = deleteRule;
         }
+
 
     }
 }
