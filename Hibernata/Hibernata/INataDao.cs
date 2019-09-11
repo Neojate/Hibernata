@@ -36,5 +36,24 @@ namespace Hibernata
 
         #endregion
 
+
+
+        #region INSERT OR UPDATE
+
+        #endregion
+
+
+
+        #region DELETE
+
+        #endregion
+
+
+
+        #region MISCELANEA
+
+        #endregion
+
+
     }
 }
