@@ -1,15 +1,23 @@
-﻿using Hibernata.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Hibernata.Model;
 
-namespace Hibernata
+namespace Hibernata.Model
 {
     public class category : BaseModel
     {
         public int categoryId { get; set; }
         public string categoryName { get; set; }
+
+        public category()
+        {
+
+        }
+
+        public category(int categoryId, string categoryName)
+        {
+            this.categoryId = categoryId;
+            this.categoryName = categoryName;
+        }
+
     }
 }

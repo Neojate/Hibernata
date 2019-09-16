@@ -18,6 +18,8 @@ namespace Hibernata
     public class Hibernata<T> : PrimaryNataMethods, INataDao<T>  where T : BaseModel
     {
 
+        private const string PRIMARY_KEY = "PRI";
+
         T obj = default(T);
 
         private List<PropertyInfo> properties = new List<PropertyInfo>();
@@ -101,6 +103,7 @@ namespace Hibernata
 
         public int Insert(List<T> objs)
         {
+            //TODO: ACABAR ESTE MÉTODO
             string sql = 
                 sentenceSqlFrom(CrudType.Insert) +
                 "VALUES ";
@@ -111,7 +114,36 @@ namespace Hibernata
             return launchTransaction(sql, objs);
         }
         #endregion
-        
+
+
+
+        #region UPDATE
+        public int Update(T obj)
+        {
+            List<PropertyInfo> nonKeys = obj.Properties;
+            foreach (var p in obj.PrimaryKeys)
+                nonKeys.Remove(p);
+
+            string sql = 
+                "UPDATE " + obj.Name + " " +
+                "SET ";
+            for (int i = 0; i < nonKeys.Count - 1; i++)
+                sql += nonKeys[i].Name +  " = '" + nonKeys[i].GetValue(obj) + "', ";
+            sql += nonKeys.Last().Name + " = '" + nonKeys.Last().GetValue(obj) + "' ";
+            sql += "WHERE ";
+            for (int i = 0; i < obj.PrimaryKeys.Count - 1; i++)
+                sql += obj.PrimaryKeys[i].Name + " = '" + obj.PrimaryKeys[i].GetValue(obj) + "' AND ";
+            sql += obj.PrimaryKeys.Last().Name + " = '" + obj.PrimaryKeys.Last().GetValue(obj) + "'";
+
+            return launchPrimitiveTransaction(sql);
+        }
+
+        public int Update(List<T> objs)
+        {
+            return 0;
+        }
+        #endregion
+
 
 
         #region MÉTODOS PRIVADOS
@@ -178,6 +210,36 @@ namespace Hibernata
             }
             return objs;
         }
+
+        private int launchPrimitiveTransaction(string sql)
+        {
+            int result = 0;
+            MySqlTransaction tx = null;
+
+            try
+            {
+                MySqlCommand cmd = createTransaction(sql);
+                tx = connection.BeginTransaction();
+
+                result = cmd.ExecuteNonQuery();
+                tx.Commit();
+            }
+            catch (MySqlException e)
+            {
+                tx.Rollback();
+                throw new NataException(GetNataErrorMessage(e.Number));
+            }
+            catch (Exception e)
+            {
+                tx.Rollback();
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                closeQuery();
+            }
+            return result;
+        }
         
         private int launchTransaction(string sql, List<T> objs)
         {
@@ -201,7 +263,6 @@ namespace Hibernata
                 tx.Rollback();
                 throw new NataException(GetNataErrorMessage(e.Number));
             }
-
             catch (Exception e)
             {
                 if (result != objs.Count)

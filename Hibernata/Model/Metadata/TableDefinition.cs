@@ -10,6 +10,8 @@ namespace Hibernata.Model
 {
     public class TableDefinition
     {
+        public const string PRIMARY_KEY = "PRI";
+
         public List<RowDefinition> Rows { get; set; }
 
         public TableDefinition()

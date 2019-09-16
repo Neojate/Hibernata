@@ -19,14 +19,25 @@ namespace Hibernata
 
             try
             {
-                factory.CreateBaseModel("Hibernata");
+                //factory.CreateBaseModel("Hibernata");
             }
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
             }
 
-            INataDao<watchedlist> nataWatched = new Hibernata<watchedlist>();
+            INataDao<category> nataCategory = new Hibernata<category>();
+            try
+            {
+                nataCategory.Update(new category(6, "Zombies"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+            /*INataDao<watchedlist> nataWatched = new Hibernata<watchedlist>();
 
             try
             {

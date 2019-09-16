@@ -33,7 +33,8 @@ namespace Hibernata
 
 
         #region UPDATE
-
+        int Update(T obj);
+        int Update(List<T> objs);
         #endregion
 
 

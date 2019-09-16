@@ -144,7 +144,7 @@ namespace Hibernata
                 Directory.CreateDirectory(dir);
             else
                 if (!File.Exists(dir + "\\" + fileName))
-                File.Delete(dir + "\\" + fileName);
+                    File.Delete(dir + "\\" + fileName);
 
             string body = "";
 
