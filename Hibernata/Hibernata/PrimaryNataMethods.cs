@@ -58,6 +58,15 @@ namespace Hibernata
             return text;
         }
 
+        protected string separator(List<string> objs, string symbol)
+        {
+            string text = "";
+            for (int i = 0; i < objs.Count - 1; i++)
+                text +=  symbol + objs[i] + symbol + ", ";
+            text += symbol + objs.Last() + symbol;
+            return text;
+        }
+
         protected string separator(List<Filter> objs)
         {
             string text = "";

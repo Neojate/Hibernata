@@ -88,30 +88,28 @@ namespace Hibernata
         #region INSERT
         public int Insert(T obj)
         {
-            TableDefinition tb = new TableDefinition().LoadTableData(obj.Name);
+            return Insert(new List<T>() { obj });    
+        }
+
+        public int Insert(List<T> objs)
+        {
+            if (objs.Count <= 0)
+                return -1;
+
+            TableDefinition tb = new TableDefinition().LoadTableData(objs.First().Name);
 
             string AIproperty = "";
 
             foreach (var p in tb.Rows.Where(x => x.IsAutoIncremental))
                 AIproperty = p.Field;
 
-            string sql = "INSERT INTO " + obj.Name + " (" + separator(obj.PropertyNames.Where(x => !x.Equals(AIproperty)).ToList()) + ") " +
-                "VALUES (" + separator(obj.Properties.Where(x => !x.Name.Equals(AIproperty)).Select(x => "@" + x.Name).ToList()) + ")";
-
-            return launchTransaction(sql, new List<T>() { obj });    
-        }
-
-        public int Insert(List<T> objs)
-        {
-            //TODO: ACABAR ESTE MÉTODO
-            string sql = 
-                sentenceSqlFrom(CrudType.Insert) +
-                "VALUES ";
+            string sql = sentenceSqlFrom(CrudType.Insert) + obj.Name + " " +
+                "(" + separator(obj.PropertyNames.Where(x => !x.Equals(AIproperty)).ToList()) + ") VALUES ";
             for (int i = 0; i < objs.Count - 1; i++)
-                sql += "(" + separator(properties.Select(x => "@" + x.Name).ToList()) + "), ";
-            sql += "(" + separator(properties.Select(x => "@" + x.Name).ToList()) + ")";
-
-            return launchTransaction(sql, objs);
+                sql += "(" + separator(objs[i].Properties.Where(x => !x.Name.Equals(AIproperty)).Select(x => x.GetValue(objs[i]).ToString()).ToList(), "'") + "), ";
+            sql += "(" + separator(objs.Last().Properties.Where(x => !x.Name.Equals(AIproperty)).Select(x => x.GetValue(objs.Last()).ToString()).ToList(), "'") + ")";
+            
+            return launchTransaction(sql);
         }
         #endregion
 
@@ -135,7 +133,7 @@ namespace Hibernata
                 sql += obj.PrimaryKeys[i].Name + " = '" + obj.PrimaryKeys[i].GetValue(obj) + "' AND ";
             sql += obj.PrimaryKeys.Last().Name + " = '" + obj.PrimaryKeys.Last().GetValue(obj) + "'";
 
-            return launchPrimitiveTransaction(sql);
+            return launchTransaction(sql);
         }
 
         public int Update(List<T> objs)
@@ -211,7 +209,7 @@ namespace Hibernata
             return objs;
         }
 
-        private int launchPrimitiveTransaction(string sql)
+        private int launchTransaction(string sql)
         {
             int result = 0;
             MySqlTransaction tx = null;
@@ -241,41 +239,6 @@ namespace Hibernata
             return result;
         }
         
-        private int launchTransaction(string sql, List<T> objs)
-        {
-            int result = 0;
-            MySqlTransaction tx = null;
-
-            try
-            {
-                MySqlCommand cmd = createTransaction(sql);
-                tx = connection.BeginTransaction();
-
-                foreach (var o in objs)
-                    foreach (var p in properties)
-                        cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(o));
-
-                result = cmd.ExecuteNonQuery();
-                tx.Commit();
-            }
-            catch (MySqlException e)
-            {
-                tx.Rollback();
-                throw new NataException(GetNataErrorMessage(e.Number));
-            }
-            catch (Exception e)
-            {
-                if (result != objs.Count)
-                    tx.Rollback();
-                Console.WriteLine(e);
-            }
-            finally
-            {
-                closeQuery();
-            }
-            return result;
-        }
-
         private T fillReadedObject(MySqlDataReader reader)
         {
             T newObj = Activator.CreateInstance<T>();
