@@ -119,7 +119,7 @@ namespace Hibernata
         public int Update(T obj)
         {
             List<PropertyInfo> nonKeys = obj.Properties;
-            foreach (var p in obj.PrimaryKeys)
+            foreach (var p in obj.PrimaryKeyFields)
                 nonKeys.Remove(p);
 
             string sql = 
@@ -129,9 +129,9 @@ namespace Hibernata
                 sql += nonKeys[i].Name +  " = '" + nonKeys[i].GetValue(obj) + "', ";
             sql += nonKeys.Last().Name + " = '" + nonKeys.Last().GetValue(obj) + "' ";
             sql += "WHERE ";
-            for (int i = 0; i < obj.PrimaryKeys.Count - 1; i++)
-                sql += obj.PrimaryKeys[i].Name + " = '" + obj.PrimaryKeys[i].GetValue(obj) + "' AND ";
-            sql += obj.PrimaryKeys.Last().Name + " = '" + obj.PrimaryKeys.Last().GetValue(obj) + "'";
+            for (int i = 0; i < obj.PrimaryKeyFields.Count - 1; i++)
+                sql += obj.PrimaryKeyFields[i].Name + " = '" + obj.PrimaryKeyFields[i].GetValue(obj) + "' AND ";
+            sql += obj.PrimaryKeyFields.Last().Name + " = '" + obj.PrimaryKeyFields.Last().GetValue(obj) + "'";
 
             return launchTransaction(sql);
         }

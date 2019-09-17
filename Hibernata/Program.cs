@@ -29,14 +29,14 @@ namespace Hibernata
             INataDao<category> nataCategory = new Hibernata<category>();
             try
             {
-                //nataCategory.Update(new category(12, "Zombis"));
-                List<category> categories = new List<category>()
+                nataCategory.Update(new category(6, "Zombis"));
+                /*List<category> categories = new List<category>()
                 {
                     new category(1, "Misterio"),
                     new category(1, "Ciencia ficción"),
                     new category(1, "Slasher")
                 };
-                nataCategory.Insert(new category(1, "Marujeo"));
+                nataCategory.Insert(new category(1, "Marujeo"));*/
             }
             catch (Exception e)
             {
@@ -93,7 +93,7 @@ namespace Hibernata
             };
             nataPlatformuser.Insert(platformusers);*/
 
-            Console.WriteLine("Programa terminado");
+            Console.WriteLine("Programa terminado.");
             Console.ReadLine();
         }
     }

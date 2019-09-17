@@ -10,6 +10,7 @@ namespace Hibernata.Model
 {
     public abstract class BaseModel
     {
+        private TableDefinition tableDef = new TableDefinition();
 
         public override string ToString()
         {
@@ -24,13 +25,26 @@ namespace Hibernata.Model
             get { return GetType().Name.Split('.').Last(); }
         }
 
+
+
+        #region MÉTODOS PRIVADOS
+        private void createXMLIfNotExists()
+        {
+            string fileName = "Model\\" + Name + ".xml";
+            if (File.Exists(fileName))
+                return;
+
+            NataFactory factory = new NataFactory();
+            TableDefinition tableDef = new TableDefinition();
+            tableDef.Rows = factory.CreateRowDefinitionQuery(Name);
+            tableDef.SaveTableData(Name);
+        }
+
         private List<PropertyInfo> findPrimaryKeys()
         {
             List<PropertyInfo> properties = new List<PropertyInfo>();
 
-            string fileName = "Model\\" + Name + ".txt";
-            if (!File.Exists(fileName))
-                Console.WriteLine("Hacer que se lea desde aquí");
+            createXMLIfNotExists();
 
             TableDefinition tableDef = new TableDefinition().LoadTableData(Name);
 
@@ -44,6 +58,26 @@ namespace Hibernata.Model
 
             return properties;
         }
+
+        private List<PropertyInfo> findAutoIncremental()
+        {
+            List<PropertyInfo> properties = new List<PropertyInfo>();
+
+            createXMLIfNotExists();
+
+            tableDef = tableDef.LoadTableData(Name);
+
+            string[] AINames = tableDef.Rows
+                .Where(x => x.IsAutoIncremental)
+                .Select(x => x.Field)
+                .ToArray();
+
+            foreach (string s in AINames)
+                properties = Properties.Where(x => x.Name.Equals(s)).ToList();
+
+            return properties;
+        }
+        #endregion
 
         public List<PropertyInfo> Properties
         {
@@ -59,9 +93,14 @@ namespace Hibernata.Model
             get { return Properties.Select(x => x.Name).ToList(); }
         }
 
-        public List<PropertyInfo> PrimaryKeys
+        public List<PropertyInfo> PrimaryKeyFields
         {
             get { return findPrimaryKeys();  }
+        }
+
+        public List<PropertyInfo> IncrementalFields
+        {
+            get { return findAutoIncremental(); }
         }
 
         

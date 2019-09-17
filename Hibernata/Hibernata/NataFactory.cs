@@ -37,7 +37,7 @@ namespace Hibernata
             {
                 TableDefinition tableDef = new TableDefinition();
 
-                tableDef.Rows = createRowDefinitionQuery(t);
+                tableDef.Rows = CreateRowDefinitionQuery(t);
 
                 foreach (RowDefinition r in tableDef.Rows.Where(x => x.Key != null))
                     r.ForeignKey = createForeignDefinition(t, r.Field);
@@ -78,12 +78,7 @@ namespace Hibernata
             
         }
 
-        private void createXmlModel(TableDefinition tableDef)
-        {
-
-        }
-
-        private List<RowDefinition> createRowDefinitionQuery(string tableName)
+        public List<RowDefinition> CreateRowDefinitionQuery(string tableName)
         {
             List<RowDefinition> rows = new List<RowDefinition>();
             MySqlDataReader reader = createQuery("describe " + tableName);
