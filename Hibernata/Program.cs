@@ -31,9 +31,12 @@ namespace Hibernata
 
             try
             {
-                Filter set = new Filter("lastname", "Funciona");
-                Filter filter = new Filter("firstname", "Gato");
-                nataUser.Update(set.ToList(), filter.ToList());
+                List<Filter> sets = new List<Filter>()
+                {
+                    new Filter("lastname", "Apellido")
+                };
+                Filter filter = new Filter("roleId", 2);
+                nataUser.Update(sets, filter);
             }
             catch (Exception e)
             {

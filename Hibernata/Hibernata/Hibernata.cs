@@ -52,7 +52,7 @@ namespace Hibernata
 
             string sql =
                 sentenceSqlFrom(CrudType.Select) +
-                "WHERE " + separator(filters);
+                "WHERE " + separator(filters, Filter.AND);
 
             return launchQueryAll(sql).FirstOrDefault(); 
         }
@@ -77,7 +77,7 @@ namespace Hibernata
 
             string sql =
                 sentenceSqlFrom(CrudType.Select) +
-                "WHERE " + separator(filters);
+                "WHERE " + separator(filters, Filter.AND);
 
             return launchQueryAll(sql);
         }
@@ -159,8 +159,8 @@ namespace Hibernata
 
             string sql =
                 "UPDATE " + obj.Name + " " +
-                "SET " + separator(sets) + " " +
-                "WHERE " + separator(filters);
+                "SET " + separator(sets, Filter.COMA) + " " +
+                "WHERE " + separator(filters, Filter.AND);
 
             return launchTransaction(sql);
         }

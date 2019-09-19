@@ -67,11 +67,11 @@ namespace Hibernata
             return text;
         }
 
-        protected string separator(List<Filter> objs)
+        protected string separator(List<Filter> objs, string conjuntion)
         {
             string text = "";
             for (int i = 0; i < objs.Count - 1; i++)
-                text += objs[i].ColumnName + " = '" + objs[i].ColumnValue + "' AND ";
+                text += objs[i].ColumnName + " = '" + objs[i].ColumnValue + "'" + conjuntion + " ";
             text += objs.Last().ColumnName + " = '" + objs.Last().ColumnValue + "'";
             return text;
         }

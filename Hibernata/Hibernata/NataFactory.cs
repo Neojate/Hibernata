@@ -45,37 +45,7 @@ namespace Hibernata
                 tableDef.SaveTableData(t);
 
                 createFileModel(namespaceName, t, tableDef.Rows);
-            }
-
-            /*foreach (string s in tables)
-            {
-                List<object[]> columns = new List<object[]>();
-
-                reader = createQuery("describe " + s);
-
-                TableDefinition tableDefinition = new TableDefinition();
-
-                while (reader.Read())
-                {
-                    columns.Add(new object[] { reader.GetString(0), reader.GetString(1) });
-                    RowDefinition rowDef = new RowDefinition(
-                        reader.GetString(0),
-                        reader.GetString(1),
-                        false,
-                        reader.GetString(3),
-                        null,
-                        reader.GetString(5).Contains("increment") ? true : false,
-                        null);
-                    tableDefinition.AddRow(rowDef);
-                }
-
-                closeQuery();
-
-                tableDefinition.SaveTableData(s);
-
-                createFileModel(namespaceName, s, columns);
-            }*/
-            
+            }            
         }
 
         public List<RowDefinition> CreateRowDefinitionQuery(string tableName)
@@ -107,8 +77,7 @@ namespace Hibernata
                 "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE U " +
                 "LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C " +
                 "ON U.CONSTRAINT_NAME = C.CONSTRAINT_NAME " +
-                "WHERE C.TABLE_NAME = '" + tableName + "' AND " +
-                "COLUMN_NAME = '" + columnName + "'";
+                "WHERE C.TABLE_NAME = '" + tableName + "' AND COLUMN_NAME = '" + columnName + "'";
 
             MySqlDataReader reader = createQuery(sql);
 

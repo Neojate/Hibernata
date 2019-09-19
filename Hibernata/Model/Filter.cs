@@ -8,6 +8,9 @@ namespace Hibernata
 {
     public class Filter
     {
+        public const string COMA = ",";
+        public const string AND = " AND";
+
         private string columnName;
         private string columnValue;
 
