@@ -16,6 +16,9 @@ namespace Hibernata
             NataConnection.CreateBridge("bdmarianflix", "albert", "");
 
             NataFactory factory = new NataFactory();
+            INataDao<category> nataCategory = new Hibernata<category>();
+            INataDao<platformuser> nataUser = new Hibernata<platformuser>();
+            INataDao<watchedlist> nataWatched = new Hibernata<watchedlist>();
 
             try
             {
@@ -26,17 +29,28 @@ namespace Hibernata
                 Console.WriteLine(e.Message);
             }
 
-            INataDao<category> nataCategory = new Hibernata<category>();
+            try
+            {
+                Filter set = new Filter("lastname", "Funciona");
+                Filter filter = new Filter("firstname", "Gato");
+                nataUser.Update(set.ToList(), filter.ToList());
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            /*INataDao<category> nataCategory = new Hibernata<category>();
             try
             {
                 nataCategory.Update(new category(6, "Zombis"));
-                /*List<category> categories = new List<category>()
+                List<category> categories = new List<category>()
                 {
                     new category(1, "Misterio"),
                     new category(1, "Ciencia ficción"),
                     new category(1, "Slasher")
                 };
-                nataCategory.Insert(new category(1, "Marujeo"));*/
+                nataCategory.Insert(new category(1, "Marujeo"));
             }
             catch (Exception e)
             {

@@ -34,7 +34,10 @@ namespace Hibernata
 
         #region UPDATE
         int Update(T obj);
-        int Update(List<T> objs);
+        int Update(Filter set, Filter filter);
+        int Update(Filter set, List<Filter> filters);
+        int Update(List<Filter> sets, Filter filter);
+        int Update(List<Filter> sets, List<Filter> filters);
         #endregion
 
 

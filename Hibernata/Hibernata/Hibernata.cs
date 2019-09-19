@@ -136,9 +136,33 @@ namespace Hibernata
             return launchTransaction(sql);
         }
 
-        public int Update(List<T> objs)
+        public int Update(Filter set, Filter filter)
         {
-            return 0;
+            return Update(set.ToList(), filter.ToList());
+        }
+
+        public int Update(Filter set, List<Filter> filters)
+        {
+            return Update(set.ToList(), filters);
+        }
+
+        public int Update(List<Filter> sets, Filter filter)
+        {
+            return Update(sets, filter.ToList());
+        }
+
+        public int Update(List<Filter> sets, List<Filter> filters)
+        {
+            List<PropertyInfo> nonKeys = obj.Properties;
+            foreach (var p in obj.PrimaryKeyFields)
+                nonKeys.Remove(p);
+
+            string sql =
+                "UPDATE " + obj.Name + " " +
+                "SET " + separator(sets) + " " +
+                "WHERE " + separator(filters);
+
+            return launchTransaction(sql);
         }
         #endregion
 
