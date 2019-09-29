@@ -43,7 +43,8 @@ namespace Hibernata
 
 
         #region INSERT OR UPDATE
-
+        int InsertOrUpdate(T obj);
+        int InsertOrUpdate(List<T> objs);
         #endregion
 
 

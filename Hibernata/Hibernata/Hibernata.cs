@@ -168,6 +168,45 @@ namespace Hibernata
 
 
 
+        #region INSERT OR UPDATE
+        public int InsertOrUpdate(T obj)
+        {
+            List<PropertyInfo> ps = obj.Properties;
+
+            foreach (var pK in obj.PrimaryKeyFields)
+                ps.Remove(pK);
+
+            foreach (var iA in obj.IncrementalFields)
+                ps.Remove(iA);
+
+            List<string> updatefields = new List<string>();
+            foreach (var p in ps)
+                updatefields.Add(p.Name + " = " + p.GetValue(obj).ToString());
+
+            string sql =
+                sentenceSqlFrom(CrudType.Insert) +
+                "VALUES (";
+            for (int i = 0; i < obj.Properties.Count - 1; i++)
+                sql += "'" + obj.Properties[i].GetValue(obj) + "', ";
+            sql += "'" + obj.Properties.Last().GetValue(obj) + "') ";
+            sql += "ON DUPLICATE KEY UPDATE ";
+            for (int i = 0; i < ps.Count - 1; i++)
+                sql += ps[i].Name + " = '" + ps[i].GetValue(obj).ToString() + "', ";
+            sql += ps.Last().Name + " = '" + ps.Last().GetValue(obj).ToString() + "'";
+
+            return launchTransaction(sql);
+
+            //hay que rehacer los separators
+        }
+
+        public int InsertOrUpdate(List<T> obj)
+        {
+            return 0;
+        }
+        #endregion
+
+
+
         #region MÉTODOS PRIVADOS
         private bool checkFilters(List<Filter> filters)
         {

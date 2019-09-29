@@ -31,6 +31,16 @@ namespace Hibernata
 
             try
             {
+                category c = new category(3, "drama");
+                nataCategory.InsertOrUpdate(c);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            /*try
+            {
                 List<Filter> sets = new List<Filter>()
                 {
                     new Filter("lastname", "Apellido")
@@ -41,7 +51,7 @@ namespace Hibernata
             catch (Exception e)
             {
 
-            }
+            }*/
 
             /*INataDao<category> nataCategory = new Hibernata<category>();
             try
