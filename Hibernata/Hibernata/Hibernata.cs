@@ -41,20 +41,44 @@ namespace Hibernata
             return Select(new Filter(properties.First().Name, id).ToList());
         }
 
+        public T Select(string[] fields, object id)
+        {
+            return Select(fields, new Filter(properties.First().Name, id).ToList());
+        }
+
         public T Select(Filter filter)
         {
             return Select(filter.ToList());
+        }
+
+        public T Select(string[] fields, Filter filter)
+        {
+            return Select(fields, filter.ToList());
         }
 
         public T Select(List<Filter> filters)
         {
             checkFilters(filters);
 
-            string sql =
-                sentenceSqlFrom(CrudType.Select) +
-                "WHERE " + separator(filters, Filter.AND);
+            string sql = string.Format(
+                "{0} WHERE {1}",
+                sentenceSqlFrom(CrudType.Select), separator(filters, Filter.AND)
+                );
 
-            return launchQueryAll(sql).FirstOrDefault(); 
+            return launchQueryAll(sql).FirstOrDefault();
+        }
+
+        public T Select(string[] fields, List<Filter> filters)
+        {
+            checkFilters(filters);
+            //TODO: hacer un check de fields
+
+            string sql = string.Format(
+                "{0} WHERE {1}",
+                sentenceSqlFrom(CrudType.Select, fields), separator(filters, Filter.AND)
+                );
+
+            return launchQueryAll(sql).FirstOrDefault();
         }
         #endregion
 
@@ -66,18 +90,42 @@ namespace Hibernata
             return launchQueryAll(sentenceSqlFrom(CrudType.Select));
         }
 
+        public List<T> SelectAll(string[] fields)
+        {
+            return launchQueryAll(sentenceSqlFrom(CrudType.Select, fields));
+        }
+
         public List<T> SelectAll(Filter filter)
         {
             return SelectAll(filter.ToList());
+        }
+
+        public List<T> SelectAll(string[] fields, Filter filter)
+        {
+            return SelectAll(fields, filter.ToList());
         }
 
         public List<T> SelectAll(List<Filter> filters)
         {
             checkFilters(filters);
 
-            string sql =
-                sentenceSqlFrom(CrudType.Select) +
-                "WHERE " + separator(filters, Filter.AND);
+            string sql = string.Format(
+                "{0} WHERE {1}",
+                sentenceSqlFrom(CrudType.Select), separator(filters, Filter.AND)
+                );
+
+            return launchQueryAll(sql);
+        }
+
+        public List<T> SelectAll(string[] fields, List<Filter> filters)
+        {
+            checkFilters(filters);
+            //TODO: hacer un checkFields;
+
+            string sql = string.Format(
+                "{0} WHERE {1}",
+                sentenceSqlFrom(CrudType.Select, fields), separator(filters, Filter.AND)
+                );
 
             return launchQueryAll(sql);
         }
@@ -216,6 +264,14 @@ namespace Hibernata
             return true;   
         }
 
+        private bool checkFields(string[] fields)
+        {
+            foreach (string f in fields)
+                if (properties.FirstOrDefault(p => p.Name.Equals(f, StringComparison.InvariantCultureIgnoreCase)) == null)
+                    throw new NataException(NataException.NO_FILTER_RECIPROCATION);
+            return true;
+        }
+
         private string sentenceSqlFrom(CrudType type)
         {
             string sqlBegin = "";
@@ -229,6 +285,21 @@ namespace Hibernata
                     break;
             }
             return sqlBegin + obj.Name + " ";
+        }
+
+        private string sentenceSqlFrom(CrudType type, string[] fields)
+        {
+            string sqlBegin = "";
+            switch(type)
+            {
+                case CrudType.Select:
+                    sqlBegin = string.Format("SELECT {0} FROM {1}", separator(fields.ToList()), obj.Name);
+                    break;
+                case CrudType.Insert:
+                    sqlBegin = string.Format("INSERT INTO {0} ({1})", obj.Name, separator(fields.ToList()));
+                    break;
+            }
+            return sqlBegin;
         }
 
         private T launchQuery(string sql)
